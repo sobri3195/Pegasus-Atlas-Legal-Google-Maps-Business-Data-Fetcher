@@ -131,6 +131,6 @@ export class ExportService {
       doc.text(`Note: Only first 100 records shown. Export to Excel/CSV for full data.`, 14, finalY + 10);
     }
 
-    await fs.writeFile(filePath, doc.output('arraybuffer'));
+    await fs.writeFile(filePath, Buffer.from(doc.output('arraybuffer')));
   }
 }

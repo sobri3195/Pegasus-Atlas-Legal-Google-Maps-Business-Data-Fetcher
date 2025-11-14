@@ -66,11 +66,34 @@ Ekstraksi elemen halaman seperti:
 
 ## 🛠️ Teknologi
 
-- **Desktop**: Electron
-- **Automation Engine**: Puppeteer
-- **Parser**: Cheerio
-- **Database**: LowDB
-- **UI**: React + TypeScript
+### Core Technologies
+- **Desktop Framework**: Electron / Tauri
+- **Automation Engine**: Puppeteer / Playwright / Selenium
+- **HTML Parser**: Cheerio / DOM Inspector (JSDOM)
+- **Database**: LowDB / SQLite
+- **UI Framework**: React + TypeScript + Vite
+
+### Multi-Engine Support
+Pegasus Atlas mendukung multiple engines yang dapat dikonfigurasi sesuai kebutuhan:
+
+**Automation Engines:**
+- **Puppeteer** (Default) - Fast, Chrome-only automation
+- **Playwright** - Multi-browser support (Chrome, Firefox, Safari)
+- **Selenium** - Traditional WebDriver-based automation
+
+**Parser Engines:**
+- **Cheerio** (Default) - Fast jQuery-like HTML parser
+- **DOM Inspector** - Native DOM parsing with JSDOM
+
+**Database Engines:**
+- **LowDB** (Default) - Simple JSON file database
+- **SQLite** - Full-featured SQL database
+
+**Desktop Frameworks:**
+- **Electron** (Default) - Feature-rich desktop framework
+- **Tauri** - Lightweight Rust-based alternative (migration ready)
+
+See [CONFIGURATION.md](docs/CONFIGURATION.md) for detailed configuration guide.
 
 ---
 
@@ -109,6 +132,22 @@ npm run lint
 npm run format
 ```
 
+### Configuration
+```bash
+# Use default engines (Puppeteer + Cheerio + LowDB)
+npm run dev
+
+# Use Playwright + SQLite
+export APP_CONFIG='{"automation":"playwright","database":"sqlite"}'
+npm run dev
+
+# Use Selenium + DOM Inspector + SQLite
+export APP_CONFIG='{"automation":"selenium","parser":"dom-inspector","database":"sqlite"}'
+npm run dev
+```
+
+For detailed configuration options, see [CONFIGURATION.md](docs/CONFIGURATION.md)
+
 ---
 
 ## 📁 Struktur Project
@@ -116,11 +155,17 @@ npm run format
 ```
 pegasus-atlas/
 ├── src/
+│   ├── adapters/          # Adapter pattern implementations
+│   │   ├── automation/    # Puppeteer, Playwright, Selenium
+│   │   ├── parser/        # Cheerio, DOM Inspector
+│   │   └── database/      # LowDB, SQLite
+│   ├── config/            # Configuration & Factory
 │   ├── main/              # Electron main process
 │   ├── renderer/          # UI components (React)
 │   ├── automation/        # Browser automation logic
 │   ├── data/              # Data processing & storage
 │   └── utils/             # Utility functions
+├── docs/                  # Documentation
 ├── public/                # Static assets
 ├── dist/                  # Build output
 └── package.json

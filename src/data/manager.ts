@@ -1,46 +1,33 @@
-import { JSONFilePreset } from 'lowdb/node';
-import * as path from 'path';
-import { app } from 'electron';
 import { BusinessData } from '../automation/engine';
+import { IDatabaseAdapter } from '../adapters/database/IDatabaseAdapter';
 import { normalizeAddress, normalizePhone } from '../utils/helpers';
 
-interface Database {
-  results: BusinessData[];
-}
-
 export class DataManager {
-  private db: any;
-  private dbPath: string;
+  private databaseAdapter: IDatabaseAdapter;
 
-  constructor() {
-    const userDataPath = app.getPath('userData');
-    this.dbPath = path.join(userDataPath, 'pegasus-atlas-db.json');
+  constructor(databaseAdapter: IDatabaseAdapter) {
+    this.databaseAdapter = databaseAdapter;
   }
 
   async initialize() {
-    if (!this.db) {
-      const defaultData: Database = { results: [] };
-      this.db = await JSONFilePreset(this.dbPath, defaultData);
-    }
+    await this.databaseAdapter.initialize();
   }
 
   async saveResults(results: BusinessData[]) {
     await this.initialize();
-    
-    this.db.data.results.push(...results);
-    await this.db.write();
+    await this.databaseAdapter.saveResults(results);
   }
 
   async getAllResults(): Promise<BusinessData[]> {
     await this.initialize();
-    return this.db.data.results;
+    return await this.databaseAdapter.getAllResults();
   }
 
   async cleanData(): Promise<BusinessData[]> {
     await this.initialize();
-    
-    const results = this.db.data.results;
-    
+
+    const results = await this.databaseAdapter.getAllResults();
+
     const normalized = results.map((item: BusinessData) => ({
       ...item,
       address: item.address ? normalizeAddress(item.address) : undefined,
@@ -48,41 +35,30 @@ export class DataManager {
     }));
 
     const uniqueMap = new Map<string, BusinessData>();
-    
+
     for (const item of normalized) {
       const key = `${item.name}-${item.address || ''}-${item.phone || ''}`.toLowerCase();
-      
+
       if (!uniqueMap.has(key)) {
         uniqueMap.set(key, item);
       }
     }
-    
+
     const cleaned = Array.from(uniqueMap.values());
-    
-    this.db.data.results = cleaned;
-    await this.db.write();
-    
+
+    await this.databaseAdapter.clearAll();
+    await this.databaseAdapter.saveResults(cleaned);
+
     return cleaned;
   }
 
   async clearAll() {
     await this.initialize();
-    
-    this.db.data.results = [];
-    await this.db.write();
+    await this.databaseAdapter.clearAll();
   }
 
   async getStats() {
     await this.initialize();
-    
-    const results = this.db.data.results;
-    
-    return {
-      total: results.length,
-      withPhone: results.filter((r: BusinessData) => r.phone).length,
-      withWebsite: results.filter((r: BusinessData) => r.website).length,
-      withAddress: results.filter((r: BusinessData) => r.address).length,
-      categories: [...new Set(results.map((r: BusinessData) => r.category))],
-    };
+    return await this.databaseAdapter.getStats();
   }
 }
