@@ -83,7 +83,7 @@ Ekstraksi elemen halaman seperti:
 ### Instalasi
 ```bash
 # Clone repository
-git clone <repository-url>
+git clone https://github.com/sobri3195/pegasus-atlas.git
 cd pegasus-atlas
 
 # Install dependencies
@@ -135,6 +135,34 @@ pegasus-atlas/
 - [ ] DOM selector recorder
 - [ ] Template extraction
 - [ ] Plugin marketplace
+
+---
+
+## 👨‍💻 Author
+
+**Dr. Muhammad Sobri Maulana, S.Kom, CEH, OSCP, OSCE**
+
+- 🌐 GitHub: [github.com/sobri3195](https://github.com/sobri3195)
+- 📧 Email: [muhammadsobrimaulana31@gmail.com](mailto:muhammadsobrimaulana31@gmail.com)
+- 🌍 Website: [muhammadsobrimaulana.netlify.app](https://muhammadsobrimaulana.netlify.app)
+- 💼 Portfolio: [muhammad-sobri-maulana-kvr6a.sevalla.page](https://muhammad-sobri-maulana-kvr6a.sevalla.page)
+
+### 📱 Social Media & Community
+
+- 🎥 YouTube: [@muhammadsobrimaulana6013](https://www.youtube.com/@muhammadsobrimaulana6013)
+- 📱 TikTok: [@dr.sobri](https://www.tiktok.com/@dr.sobri)
+- 💬 Telegram: [@winlin_exploit](https://t.me/winlin_exploit)
+- 👥 WhatsApp Group: [Join Community](https://chat.whatsapp.com/B8nwRZOBMo64GjTwdXV8Bl)
+
+### ☕ Support & Donation
+
+Jika project ini bermanfaat, Anda dapat mendukung pengembangan lebih lanjut melalui:
+
+- 💰 Lynk.id: [lynk.id/muhsobrimaulana](https://lynk.id/muhsobrimaulana)
+- ☕ Trakteer: [trakteer.id/g9mkave5gauns962u07t](https://trakteer.id/g9mkave5gauns962u07t)
+- 🎨 Gumroad: [maulanasobri.gumroad.com](https://maulanasobri.gumroad.com)
+- 💝 KaryaKarsa: [karyakarsa.com/muhammadsobrimaulana](https://karyakarsa.com/muhammadsobrimaulana)
+- 🎁 Nyawer: [nyawer.co/MuhammadSobriMaulana](https://nyawer.co/MuhammadSobriMaulana)
 
 ---
 
