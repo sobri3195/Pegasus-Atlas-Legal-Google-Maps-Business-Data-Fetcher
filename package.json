@@ -21,8 +21,16 @@
     "business-data",
     "electron"
   ],
-  "author": "Pegasus Atlas Team",
+  "author": "Dr. Muhammad Sobri Maulana, S.Kom, CEH, OSCP, OSCE <muhammadsobrimaulana31@gmail.com> (https://github.com/sobri3195)",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sobri3195/pegasus-atlas.git"
+  },
+  "bugs": {
+    "url": "https://github.com/sobri3195/pegasus-atlas/issues"
+  },
+  "homepage": "https://github.com/sobri3195/pegasus-atlas#readme",
   "devDependencies": {
     "@types/node": "^20.10.0",
     "@types/react": "^18.2.42",
