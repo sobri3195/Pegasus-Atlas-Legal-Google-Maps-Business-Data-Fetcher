@@ -1,0 +1,12 @@
+{
+  "desktop": "electron",
+  "automation": "puppeteer",
+  "parser": "cheerio",
+  "database": "lowdb",
+  "notes": {
+    "desktop": "electron | tauri",
+    "automation": "puppeteer | playwright | selenium",
+    "parser": "cheerio | dom-inspector",
+    "database": "lowdb | sqlite"
+  }
+}

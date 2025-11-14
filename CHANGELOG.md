@@ -63,6 +63,63 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - CONTRIBUTING guidelines
 - LICENSE (MIT)
 
+## [2.0.0] - 2024-11-14
+
+### Added - Multi-Engine Architecture
+- **Adapter Pattern Implementation**: Introduced abstraction layers for all core components
+- **Multiple Automation Engines Support**:
+  - Puppeteer (default) - Fast Chrome automation
+  - Playwright - Multi-browser support (Chrome, Firefox, Safari)
+  - Selenium - Traditional WebDriver-based automation
+- **Multiple Parser Engines Support**:
+  - Cheerio (default) - jQuery-like HTML parser
+  - DOM Inspector - Native DOM parsing with JSDOM
+- **Multiple Database Engines Support**:
+  - LowDB (default) - JSON file-based database
+  - SQLite - Full-featured SQL database
+- **Desktop Framework Options**:
+  - Electron (current)
+  - Tauri (migration ready)
+
+### Changed
+- Refactored `AutomationEngine` to use adapter pattern
+- Refactored `DataManager` to use database adapters
+- Updated main process to use factory pattern for adapter creation
+- Enhanced configuration system with environment variable support
+
+### Added - Configuration
+- `AppConfig` system for engine selection
+- `AdapterFactory` for creating engine instances
+- Environment variable configuration support (`APP_CONFIG`)
+- Configuration file support (`config.json`)
+
+### Added - Documentation
+- `CONFIGURATION.md` - Comprehensive configuration guide
+- `TAURI_MIGRATION.md` - Guide for migrating to Tauri
+- Engine comparison tables
+- Performance benchmarks
+- Configuration examples
+
+### Dependencies
+- Added `playwright` ^1.40.1
+- Added `selenium-webdriver` ^4.16.0
+- Added `jsdom` ^23.0.1
+- Added `sqlite` ^5.1.1
+- Added `sqlite3` ^5.1.6
+
+### Technical Improvements
+- Abstraction through interfaces (`IAutomationAdapter`, `IParserAdapter`, `IDatabaseAdapter`)
+- Factory pattern for adapter instantiation
+- Improved separation of concerns
+- Better testability through dependency injection
+- Modular architecture for easy engine swapping
+
+### Migration Notes
+- Existing code remains backward compatible
+- Default configuration uses original stack (Puppeteer + Cheerio + LowDB)
+- No breaking changes for existing users
+- New engines can be enabled via configuration
+
 ## Future Releases
 
 See [README.md](README.md) roadmap section for planned features.

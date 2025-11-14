@@ -19,6 +19,9 @@ contextBridge.exposeInMainWorld('electronAPI', {
   clearDatabase: () => 
     ipcRenderer.invoke('clear-database'),
   
+  getConfig: () =>
+    ipcRenderer.invoke('get-config'),
+  
   onBatchProgress: (callback: (progress: any) => void) => {
     ipcRenderer.on('batch-progress', (_event, progress) => callback(progress));
   },

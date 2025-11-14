@@ -1,13 +1,8 @@
-import puppeteer, { Browser, Page } from 'puppeteer';
-import * as cheerio from 'cheerio';
-import { delay, randomDelay } from '../utils/helpers';
+import { IAutomationAdapter, SearchOptions } from '../adapters/automation/IAutomationAdapter';
+import { IParserAdapter } from '../adapters/parser/IParserAdapter';
+import { delay } from '../utils/helpers';
 
-export interface SearchOptions {
-  headless?: boolean;
-  maxResults?: number;
-  delay?: number;
-  humanBehavior?: boolean;
-}
+export { SearchOptions } from '../adapters/automation/IAutomationAdapter';
 
 export interface BusinessData {
   id: string;
@@ -25,84 +20,77 @@ export interface BusinessData {
 }
 
 export class AutomationEngine {
-  private browser: Browser | null = null;
+  private automationAdapter: IAutomationAdapter;
+  private parserAdapter: IParserAdapter;
+
+  constructor(automationAdapter: IAutomationAdapter, parserAdapter: IParserAdapter) {
+    this.automationAdapter = automationAdapter;
+    this.parserAdapter = parserAdapter;
+  }
 
   async initialize(options: SearchOptions = {}) {
-    if (!this.browser) {
-      this.browser = await puppeteer.launch({
-        headless: options.headless !== false ? 'new' : false,
-        args: [
-          '--no-sandbox',
-          '--disable-setuid-sandbox',
-          '--disable-dev-shm-usage',
-          '--disable-accelerated-2d-canvas',
-          '--disable-gpu',
-        ],
-      });
-    }
+    await this.automationAdapter.initialize(options);
   }
 
   async search(keyword: string, options: SearchOptions = {}): Promise<BusinessData[]> {
     await this.initialize(options);
 
-    if (!this.browser) {
-      throw new Error('Browser not initialized');
-    }
-
-    const page = await this.browser.newPage();
-    
-    await page.setUserAgent(
+    await this.automationAdapter.setUserAgent(
       'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
     );
 
     try {
       const results: BusinessData[] = [];
-      
+
       const searchUrl = `https://www.google.com/search?q=${encodeURIComponent(keyword)}`;
-      
-      await page.goto(searchUrl, { waitUntil: 'networkidle2' });
-      
+
+      await this.automationAdapter.navigateTo(searchUrl);
+
       if (options.humanBehavior) {
-        await this.simulateHumanBehavior(page);
+        await this.automationAdapter.simulateHumanBehavior();
       }
-      
+
       if (options.delay) {
         await delay(options.delay);
       }
 
-      const content = await page.content();
-      const $ = cheerio.load(content);
-      
-      const extractedData = await this.extractBusinessData($, keyword);
+      const pageContent = await this.automationAdapter.getPageContent();
+      this.parserAdapter.load(pageContent.html);
+
+      const extractedData = await this.extractBusinessData(keyword);
       results.push(...extractedData);
 
-      await page.close();
-      
       return results.slice(0, options.maxResults || 50);
     } catch (error) {
-      await page.close();
       throw error;
     }
   }
 
-  private async extractBusinessData($: cheerio.CheerioAPI, keyword: string): Promise<BusinessData[]> {
+  private async extractBusinessData(keyword: string): Promise<BusinessData[]> {
     const results: BusinessData[] = [];
-    
-    $('div[data-attrid], div.g, div[jscontroller]').each((index, element) => {
-      const $el = $(element);
-      
-      const name = $el.find('h3, h2, [role="heading"]').first().text().trim();
-      const address = $el.find('[data-attrid*="address"], .address, [aria-label*="Address"]').first().text().trim();
-      const phone = $el.find('[data-attrid*="phone"], .phone, a[href^="tel:"]').first().text().trim();
-      const websiteLink = $el.find('a[href^="http"]').first().attr('href');
-      
+
+    const elements = this.parserAdapter.find('div[data-attrid], div.g, div[jscontroller]');
+
+    elements.forEach((element, index) => {
+      const nameElements = this.parserAdapter.find('h3, h2, [role="heading"]');
+      const name = nameElements.length > index ? nameElements[index].text : '';
+
+      const addressElements = this.parserAdapter.find('[data-attrid*="address"], .address, [aria-label*="Address"]');
+      const address = addressElements.length > index ? addressElements[index].text : '';
+
+      const phoneElements = this.parserAdapter.find('[data-attrid*="phone"], .phone, a[href^="tel:"]');
+      const phone = phoneElements.length > index ? phoneElements[index].text : '';
+
+      const websiteElements = this.parserAdapter.find('a[href^="http"]');
+      const website = websiteElements.length > index ? websiteElements[index].attributes.href : undefined;
+
       if (name && name.length > 0) {
         const businessData: BusinessData = {
           id: `${Date.now()}-${index}`,
           name,
           address: address || undefined,
           phone: phone || undefined,
-          website: websiteLink || undefined,
+          website: website || undefined,
           category: keyword,
           timestamp: Date.now(),
           metadata: {
@@ -110,35 +98,15 @@ export class AutomationEngine {
             keyword,
           },
         };
-        
+
         results.push(businessData);
       }
     });
-    
+
     return results;
   }
 
-  private async simulateHumanBehavior(page: Page) {
-    await randomDelay(500, 1500);
-    
-    await page.mouse.move(
-      Math.random() * 300 + 100,
-      Math.random() * 300 + 100
-    );
-    
-    await randomDelay(200, 800);
-    
-    await page.evaluate(() => {
-      window.scrollBy(0, Math.random() * 300 + 100);
-    });
-    
-    await randomDelay(300, 1000);
-  }
-
   async cleanup() {
-    if (this.browser) {
-      await this.browser.close();
-      this.browser = null;
-    }
+    await this.automationAdapter.cleanup();
   }
 }
